@@ -20,7 +20,7 @@ def add_initial_income(user_id):
         missing_fields = [field for field in required_fields if field not in data]
         
         if missing_fields:
-            return jsonify({"status":"error", "msg":f'Missing required field: {', '.join(missing_fields)}'}), 400
+            return jsonify({"status":"error", "msg":f"Missing required field: {', '.join(missing_fields)}"}), 400
         
         income_title = data["title"].strip()
         if len(income_title) == 0:
