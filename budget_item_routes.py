@@ -24,7 +24,7 @@ def add_budget_income(budget_id):
         missing_fields = [field for field in required_fields if field not in data]
         
         if missing_fields:
-            return jsonify({"status":"error", "msg":f'Missing required field: {', '.join(missing_fields)}'}), 400
+            return jsonify({"status":"error", "msg":f"Missing required field: {', '.join(missing_fields)}"}), 400
         
         # Validation
         income_title = data["title"].strip()
@@ -190,7 +190,7 @@ def add_budget_expense(budget_id):
         missing_fields = [field for field in required_fields if field not in data]
         
         if missing_fields:
-            return jsonify({"status":"error", "msg":f'Missing required field: {', '.join(missing_fields)}'}), 400
+            return jsonify({"status":"error", "msg":f"Missing required field: {', '.join(missing_fields)}"}), 400
 
         if float(data['amount']) < 0:
             return jsonify({"status":"error","msg": "Amount cannot be negative"}), 400
