@@ -50,7 +50,7 @@ def add_category(budget_id):
                                                   Category.title.ilike(data["title"].strip())  # Case-insensitive and trimmed
                                                 ).first()
         if existing_category:
-            return jsonify({"status":"error", "msg": f'{data['title']} already exists in this budget'}), 400
+            return jsonify({"status": "error", "msg": f"{data['title']} already exists in this budget"}), 400
         
         # Title length check (required)
         title = data['title'].strip()
