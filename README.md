@@ -1,2 +1,2 @@
 # ES_EP_JS_CapstoneProj
-Make sure to switch to your branch before coding
+This repo is used to deploy the PYF budget method updated code. Will be re-deployed later via group repo.
