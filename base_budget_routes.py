@@ -53,7 +53,7 @@ def create_budget(user_id):
             if chosen_period not in VALID_PERIODS:
                 return jsonify({
                     "status": "error",
-                    "msg": f"Invalid period '{data['period']}'. Valid options are: {', '.join(VALID_PERIODS.keys())}"
+                    "msg": f"Invalid period \"{data['period']}\". Valid options are: {', '.join(VALID_PERIODS.keys())}"
                 }), 400
             budget_period = chosen_period
         else:
