@@ -126,46 +126,49 @@ def update_category(budget_id, category_id):
 
         # Check for duplicate category title IN THIS BUDGET and validate length
         if 'title' in data:
-            existing_category = Category.query.filter(Category.budget_id == budget_id,
-                                                    Category.title.ilike(data["title"].strip())
-                                                    ).first()
-            if existing_category and existing_category.id != category.id:
-                return jsonify({"status":"error", "msg": f"'{data['title']}' already exists in this budget."}), 400
-            
             title = data['title'].strip()
             if len(title) == 0:
                 return jsonify({"status": "error", "msg": "Title cannot be empty"}), 400
             if len(title) > 100:
                 return jsonify({"status": "error", "msg": "Title too long (max 100 chars)"}), 400
 
+            existing_category = Category.query.filter(
+                Category.budget_id == budget_id,
+                Category.title.ilike(title)
+            ).first()
+            if existing_category and existing_category.id != category.id:
+                return jsonify({
+                    "status": "error",
+                    "msg": f"'{data['title']}' already exists in this budget."
+                }), 400
+
+            category.title = title
+
         # Description length check (if provided)
         if 'description' in data:
             description = data['description'].strip()
-            if description and len(description) > 100:
+            if len(description) > 100:
                 return jsonify({"status": "error", "msg": "Description too long (max 100 chars)"}), 400
+            category.description = description if description else None
 
         # Check that priority is a positive int and it is not a reserved priority
         if 'priority' in data:
-            if data['priority'] < 1:
-                return jsonify({"status":"error","msg": "Priority cannot be negative"}), 400
-            if is_reserved_priority(budget, data['priority']) and not category.is_savings:
+            new_priority = data['priority']
+            if new_priority < 1:
+                return jsonify({"status":"error", "msg": "Priority must be positive"}), 400
+            if is_reserved_priority(budget, new_priority) and not category.is_savings:
                 return jsonify({
                     "status": "error",
-                    "msg": f"Priority {data['priority']} is reserved for a required category and cannot be used."
+                    "msg": f"Priority {new_priority} is reserved for a required category and cannot be used."
                 }), 400
+            category.priority = new_priority
             
         # Check that priority is a positive int
         if 'allocated_amount' in data:
-            allocated_amount = float(data['allocated_amount'])
-            if data['allocated_amount'] < 0:
-                return jsonify({"status":"error","msg": "Allocated amount cannot be negative"}), 400
-        
-
-        # Update the category fields if provided and validated
-        category.title = data.get("title", category.title)
-        category.description = data.get("description", description if description else None)  # Store NULL if empty
-        category.priority = data.get("priority", category.priority)
-        category.allocated_amount = float(data['allocated_amount']) if 'allocated_amount' in data else category.allocated_amount
+            new_amount = float(data['allocated_amount'])
+            if new_amount < 0:
+                return jsonify({"status":"error", "msg": "Allocated amount cannot be negative"}), 400
+            category.allocated_amount = new_amount
 
         db.session.commit()
 
