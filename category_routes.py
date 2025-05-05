@@ -165,7 +165,7 @@ def update_category(budget_id, category_id):
         category.title = data.get("title", category.title)
         category.description = data.get("description", description if description else None)  # Store NULL if empty
         category.priority = data.get("priority", category.priority)
-        category.allocated_amount = data.get("allocated_amount", allocated_amount if allocated_amount else None)
+        category.allocated_amount = float(data['allocated_amount']) if 'allocated_amount' in data else category.allocated_amount
 
         db.session.commit()
 
