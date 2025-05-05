@@ -336,7 +336,7 @@ def get_all_budget_expenses(budget_id):
 
 # Get specific Budget Expense
 @budget_item_bp.route("/api/budgets/<int:budget_id>/budget-expenses/<int:budget_expense_id>", methods=["GET"])
-def get_specific_budget_expense(budget_id, expense_id):
+def get_specific_budget_expense(budget_id, budget_expense_id):
         expense = BudgetExpense.query.filter_by(id=expense_id, budget_id=budget_id).first()
         if not expense:
             return jsonify({"status":"error", "msg": "Expense not found"}), 404
@@ -349,16 +349,19 @@ def delete_budget_expense(budget_id, budget_expense_id):
     try:
         expense = BudgetExpense.query.filter_by(id=budget_expense_id, budget_id=budget_id).first()
         if not expense:
-            return jsonify({"status":"error", "msg": "Expense not found"}), 404
-        
+            return jsonify({"status": "error", "msg": "Expense not found"}), 404
+
+        # Store data before deletion
+        deleted_expense_data = expense.to_json()
+
         db.session.delete(expense)
         db.session.commit()
 
         budget = Budget.query.get(budget_id)
         if budget is None:
-            return jsonify({"status":"error", "msg":"Budget not found"}), 404
+            return jsonify({"status": "error", "msg": "Budget not found"}), 404
 
-        # Trigger budget recalculations
+        # Trigger recalculations
         if budget.method.lower() == "pay-yourself-first":
             recalculation, status = pyf_purchase_calculation(budget_id)
         else:
@@ -367,9 +370,9 @@ def delete_budget_expense(budget_id, budget_expense_id):
 
         return jsonify({
             "msg": "Expense deleted successfully",
-            "deleted_expense": expense.to_json(),
+            "deleted_expense": deleted_expense_data,
             "recalculation": recalculation
         }), status
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
